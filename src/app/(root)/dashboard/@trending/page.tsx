@@ -1,13 +1,9 @@
 import { getAllPosts } from "@/lib/store";
-import { cookies } from "next/headers";
+import { requireAuth } from "@/lib/auth";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 export default async function TrendingPage() {
-    const user = (await cookies()).get("user");
-    if (!user) {
-        redirect("/login");
-    }
+    await requireAuth();
     const posts = await getAllPosts();
     //get two most liked posts
     const mostLikedPosts = posts.sort((a, b) => b.likes - a.likes).slice(0, 2);

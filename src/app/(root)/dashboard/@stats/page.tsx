@@ -1,13 +1,9 @@
 import { getPostsByUserId } from "@/lib/store";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth";
 
 export default async function StatsPage() {
-    const user = (await cookies()).get("user");
-    if (!user) {
-        redirect("/login");
-    }
-    const posts = await getPostsByUserId(user.value);
+    const user = await requireAuth();
+    const posts = await getPostsByUserId(user.email);
     const items = [
       { label: "Total Posts", value: posts.length, color: "text-blue-600" },
       { label: "Likes", value: posts.reduce((acc, post) => acc + post.likes, 0), color: "text-emerald-600" },

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import Link from "next/link";
-import { cookies } from "next/headers";
+import { getOptionalAuth } from "@/lib/auth";
+import Logout from "@/components/logout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,8 +25,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = (await cookies()).get("user");
-  console.log(user);
+  const user = await getOptionalAuth();
   return (
     <html lang="en">
       <body
@@ -43,8 +43,8 @@ export default async function RootLayout({
                 </nav>
               </div>
               {user ? <div className="flex items-center justify-center font-sans gap-4">
-                  <span className="text-black font-bold">{user?.value}</span>
-                  <Link href="/logout" className="bg-blue-500 text-white px-4 py-2 rounded-md button">Logout</Link>
+                  <span className="text-black font-bold">{user.email}</span>
+                  <Logout />
                 </div> : (
               <div className="flex items-center justify-center font-sans gap-4">
                   <Link href="/login" className="bg-blue-500 text-white px-4 py-2 rounded-md button">Login</Link>

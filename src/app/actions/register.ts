@@ -2,6 +2,7 @@
 import { createUser, findUserByEmail } from "@/lib/store";
 import { emailRegex } from "../utils/constants";
 import { redirect } from "next/navigation";
+import bcrypt from "bcrypt";
 
 export const register = async (formData: FormData) => {
   const email = formData.get("email") as string;
@@ -28,13 +29,19 @@ export const register = async (formData: FormData) => {
     redirect("/register?error=Passwords do not match");
   }
 
+  const hashedPassword = await bcrypt.hash(password, 10);
+  if (!hashedPassword) {
+    console.log("Failed to hash password");
+    redirect("/register?error=Failed to hash password");
+  }
+
   // Optional: reject duplicate emails
   if (await findUserByEmail(email)) {
     console.log("Email already registered");
     redirect("/register?error=Email already registered");
   }
 
-  await createUser(email, password);
+  await createUser(email, hashedPassword);
   console.log("User created");
   redirect("/login");
 };

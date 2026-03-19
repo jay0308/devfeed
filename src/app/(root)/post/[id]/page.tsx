@@ -2,7 +2,7 @@ import { findPostById } from "@/lib/store";
 import { formatDate } from "@/app/utils";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { cookies } from "next/headers";
+import { getOptionalAuth } from "@/lib/auth";
 import { PostActions } from "@/components/posts/PostActions";
 
 export default async function PostPage({
@@ -10,12 +10,12 @@ export default async function PostPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const user = (await cookies()).get("user");
+  const user = await getOptionalAuth();
   const { id } = await params;
   const post = await findPostById(id);
   if (!post) notFound();
 
-  const canEdit = user?.value === post.userId;
+  const canEdit = user?.email === post.userId;
 
   return (
     <div className="post-page-container py-16 pt-16">

@@ -1,11 +1,8 @@
 import { createPostAction } from "@/app/actions/createPost";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth";
+
 const CreatePostForm = async ({searchParams}: {searchParams: Promise<{ error?: string }>;}) => {
-    const user = (await cookies()).get("user");
-    if (!user) {
-        redirect("/login");
-    }
+    await requireAuth();
     const params = await searchParams;
     const error = params.error;
     console.log(error);

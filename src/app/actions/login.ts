@@ -3,6 +3,7 @@ import { findUserByEmail } from "@/lib/store";
 import { emailRegex } from "../utils/constants";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import bcrypt from "bcrypt";
 
 export const login = async (formData: FormData) => {
     const email = formData.get("email") as string;
@@ -19,14 +20,14 @@ export const login = async (formData: FormData) => {
     }
 
     const user = await findUserByEmail(email);
+    const isPasswordValid = await bcrypt.compare(password, user?.password || '');
+    if (!isPasswordValid) {
+        console.log("Invalid password");
+        redirect("/login?error=Invalid password");
+    }
     if (!user) {
         console.log("User not found");
         redirect("/login?error=User not found");
-    }
-
-    if (user?.password !== password) {
-        console.log("Invalid password");
-        redirect("/login?error=Invalid password");
     }
 
     (await cookies()).set("user", user?.email);
