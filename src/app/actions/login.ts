@@ -21,13 +21,13 @@ export const login = async (formData: FormData) => {
 
     const user = await findUserByEmail(email);
     const isPasswordValid = await bcrypt.compare(password, user?.password || '');
-    if (!isPasswordValid) {
-        console.log("Invalid password");
-        redirect("/login?error=Invalid password");
-    }
     if (!user) {
         console.log("User not found");
         redirect("/login?error=User not found");
+    }
+    if (!isPasswordValid) {
+        console.log("Invalid password");
+        redirect("/login?error=Invalid password");
     }
 
     (await cookies()).set("user", user?.email);
